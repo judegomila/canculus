@@ -1,26 +1,198 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* the annotated-manuscript palette */
+  --paper: #f7f4ee;
+  --paper-deep: #efe9dd;
+  --paper-inset: #fbf9f5;
+  --ink: #221e18;
+  --ink-soft: #6b6355;
+  --ink-faint: #9a917f;
+  --line: #ddd5c5;
+  --line-soft: #e8e2d5;
+
+  /* semantic system — always paired with labels, never color alone */
+  --route: #1e7a4a; /* survival routes */
+  --route-soft: #e2efe6;
+  --cut: #b3402e; /* interventions / cuts */
+  --cut-soft: #f6e4e0;
+  --adapt: #a06b0a; /* treatment-induced adaptation */
+  --adapt-soft: #f4ead3;
+  --chart-blue: #0d6da1; /* second chart series */
+  --chart-blue-soft: #e0edf5;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-paper: var(--paper);
+  --color-paper-deep: var(--paper-deep);
+  --color-paper-inset: var(--paper-inset);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-faint: var(--ink-faint);
+  --color-line: var(--line);
+  --color-line-soft: var(--line-soft);
+  --color-route: var(--route);
+  --color-route-soft: var(--route-soft);
+  --color-cut: var(--cut);
+  --color-cut-soft: var(--cut-soft);
+  --color-adapt: var(--adapt);
+  --color-adapt-soft: var(--adapt-soft);
+  --color-chart-blue: var(--chart-blue);
+  --color-chart-blue-soft: var(--chart-blue-soft);
+  --font-display: var(--font-display), Georgia, serif;
+  --font-body: var(--font-body), Georgia, serif;
+  --font-mono: var(--font-mono), ui-monospace, monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body), Georgia, serif;
+  font-size: 1.155rem;
+  line-height: 1.72;
+  /* faint fiber texture: two overlaid gradients, no image assets */
+  background-image:
+    radial-gradient(
+      ellipse 80% 60% at 50% -10%,
+      rgba(160, 107, 10, 0.05),
+      transparent 60%
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 3px,
+      rgba(34, 30, 24, 0.012) 3px,
+      rgba(34, 30, 24, 0.012) 4px
+    );
+}
+
+::selection {
+  background: var(--adapt-soft);
+  color: var(--ink);
+}
+
+/* ---------- essay typography ---------- */
+
+.essay h1,
+.essay h2,
+.essay h3 {
+  font-family: var(--font-display), Georgia, serif;
+  font-variation-settings: "SOFT" 40, "WONK" 0;
+  letter-spacing: -0.01em;
+}
+
+.essay p a,
+.essay li a {
+  text-decoration: underline;
+  text-decoration-color: var(--ink-faint);
+  text-underline-offset: 3px;
+  transition: text-decoration-color 150ms ease;
+}
+
+.essay p a:hover,
+.essay li a:hover {
+  text-decoration-color: var(--cut);
+}
+
+.katex {
+  font-size: 1.02em;
+}
+
+.katex-display {
+  margin: 1.4rem 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.2rem 0;
+}
+
+/* ---------- controls ---------- */
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--line);
+  outline: none;
+  cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  transition: transform 120ms ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--paper);
+  border: 2px solid var(--ink);
+}
+
+/* ---------- animations ---------- */
+
+@keyframes flowdash {
+  to {
+    stroke-dashoffset: -14;
+  }
+}
+
+.flow-live {
+  stroke-dasharray: 5 9;
+  animation: flowdash 0.9s linear infinite;
+}
+
+@keyframes pulse-soft {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+.pulse-soft {
+  animation: pulse-soft 1.6s ease-in-out infinite;
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.rise-in {
+  animation: rise-in 700ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flow-live,
+  .pulse-soft,
+  .rise-in {
+    animation: none;
+  }
+  html {
+    scroll-behavior: auto;
+  }
 }

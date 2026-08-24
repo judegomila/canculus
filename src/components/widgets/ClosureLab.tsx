@@ -11,7 +11,7 @@ import {
   r1,
 } from "@/lib/models";
 import { PathwayDiagram } from "../PathwayDiagram";
-import { Chip, RouteCard, Verdict, displayOrder } from "./ui";
+import { Chip, ClosureVerdict, RouteCard, displayOrder } from "./ui";
 
 /** Table 4 rows, for orientation. */
 const TABLE4: { U: string[]; note: string }[] = [
@@ -36,7 +36,7 @@ export function ClosureLab() {
   const sys = useMemo(() => brafSystem(ctx), [ctx]);
 
   const res = useMemo(
-    () => adaptationClosure(sys.baseline, sys.rules, U, sys.ctx),
+    () => adaptationClosure(sys.baseline, sys.rules, U, sys.ctx, sys.universe),
     [sys, U],
   );
 
@@ -126,10 +126,26 @@ export function ClosureLab() {
             </AnimatePresence>
           </div>
           <div className="mt-4">
-            <Verdict
-              ok={res.robust}
-              okText="Esc(U,c) = ∅ — adaptation-robust"
-              failText={`Esc(U,c) = { ${res.escape.map((r) => displayOrder(r).join("∧")).join(", ")} } — escape open`}
+            <ClosureVerdict
+              status={
+                !res.robust
+                  ? "escape"
+                  : res.rulesEncoded === 0
+                    ? "unknown"
+                    : "covered"
+              }
+              text={
+                !res.robust
+                  ? `Esc(U,c) = { ${res.escape.map((r) => displayOrder(r).join("∧")).join(", ")} } — escape open`
+                  : res.rulesEncoded === 0
+                    ? "no escape route found — but 0 rules are encoded here"
+                    : `no escape route found — given ${res.rulesEncoded} rule${res.rulesEncoded === 1 ? "" : "s"} for this context`
+              }
+              detail={
+                res.robust && res.rulesEncoded === 0
+                  ? "This is ignorance, not coverage. An empty rule set makes every intervention trivially robust. The model is silent about this tissue, and silence is not evidence of safety."
+                  : undefined
+              }
             />
           </div>
 

@@ -68,6 +68,47 @@ export function Verdict({
   );
 }
 
+/**
+ * A three-way verdict. "No escape route was found" and "no escape route
+ * exists" are different claims, and an empty rule set produces the first
+ * while looking like the second. The unknown state exists to keep them apart.
+ */
+export function ClosureVerdict({
+  status,
+  text,
+  detail,
+}: {
+  status: "escape" | "covered" | "unknown";
+  text: string;
+  detail?: string;
+}) {
+  const style =
+    status === "escape"
+      ? "border-cut bg-cut-soft text-cut"
+      : status === "covered"
+        ? "border-route bg-route-soft text-route"
+        : "border-adapt bg-adapt-soft text-adapt";
+  const glyph = status === "escape" ? "✗" : status === "covered" ? "✓" : "?";
+  return (
+    <div className="flex flex-col gap-1.5">
+      <motion.div
+        key={status + text}
+        initial={false}
+        animate={{ opacity: [0.4, 1], scale: [0.97, 1] }}
+        className={`inline-flex items-center gap-2 self-start rounded-md border px-3 py-1.5 font-mono text-[0.78rem] font-semibold tracking-wide ${style}`}
+      >
+        <span aria-hidden>{glyph}</span>
+        {text}
+      </motion.div>
+      {detail && (
+        <p className="font-mono text-[0.72rem] leading-relaxed text-ink-soft">
+          {detail}
+        </p>
+      )}
+    </div>
+  );
+}
+
 /** Display caps in pathway order rather than alphabetically. */
 const CAP_ORDER = ["B", "G", "R", "C", "M", "E", "AR", "AKT", "a", "b", "c"];
 export const displayOrder = (route: readonly string[]): string[] =>

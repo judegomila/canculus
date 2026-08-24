@@ -99,6 +99,12 @@ export function PenaltyLab() {
         <div className="font-mono text-[0.68rem] font-semibold uppercase tracking-[0.15em] text-ink-faint">
           penalties c_v (toxicity + druggability + burden)
         </div>
+        <p className="-mt-1 mb-1 rounded border border-adapt/40 bg-adapt-soft/40 px-2.5 py-1.5 font-mono text-[0.68rem] leading-relaxed text-ink-soft">
+          <span className="font-semibold text-adapt">Illustrative only.</span>{" "}
+          These numbers are invented to make the ranking move. They are not
+          clinical estimates, and nothing below is derived from data — only
+          from these dials.
+        </p>
         {BRAF_CAPS.map((c) => (
           <Slider
             key={c.id}

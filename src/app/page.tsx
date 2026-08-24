@@ -141,10 +141,11 @@ export default function Home() {
               Step through the three stages. The crucial detail is the dashed
               line in stage 1: the last protein in the relay is holding the
               receptor at the top of the second relay switched off. Silence the
-              relay and you also silence the thing doing the holding. In
-              melanoma cells that second relay is barely present, so the drug
-              keeps working; in colorectal cells it is, and the tumour recovers
-              its signal within days.
+              relay and you also silence the thing doing the holding. Melanoma
+              cells express far less of that receptor and do not run this
+              particular loop, which is why the same drug behaves so
+              differently there — though, as §10 discusses, melanoma escapes by
+              other means on a slower clock.
             </>
           }
         >
@@ -331,6 +332,28 @@ export default function Home() {
           everything from here is an attempt to handle it honestly. The list of
           routes is not a fixed input. It is a function of what you do.
         </P>
+        <P>
+          It is worth stating the whole programme in one sentence before going
+          further, because the machinery that follows can obscure how simple
+          the goal is:
+        </P>
+        <blockquote className="my-7 border-l-2 border-cut pl-5 text-[1.15rem] leading-relaxed">
+          List every minimal combination of capabilities sufficient for
+          survival — those are the routes. The interventions worth considering
+          are the sets that hit every route. What you actually want is{" "}
+          <em>the smallest combination that gets maximum effect without opening
+          a new route</em>.
+        </blockquote>
+        <P>
+          The first two clauses are classical, and biology already has worked
+          examples of them. Complement activation runs through three
+          independent triggers — classical, lectin, alternative — which all
+          converge on C3 and C5. Three routes, one shared bottleneck; you can
+          block the arms separately or hit the convergence point, and
+          eculizumab is the drug that answers exactly that question. The third
+          clause is the new one, and it is the reason the first two are not
+          enough.
+        </P>
       </Prose>
 
       <Prose>
@@ -390,10 +413,46 @@ export default function Home() {
           inhibits C, then A has a net positive effect on C — two negatives
           make a positive. True, as a statement about <em>sign</em>. But it
           does not license redrawing the picture as &ldquo;A activates C&rdquo;
-          and deleting B. The redrawn version has different timing, different
-          saturation behaviour, and — fatally for our purposes — no B for a
-          drug to bind to. The shortcut preserved the sign and discarded the
-          intervention point.
+          and deleting B.
+        </P>
+        <P>
+          Here is the same move with real components. TGF-β activates
+          fibroblasts; activated fibroblasts deposit and crosslink collagen;
+          dense collagen keeps T cells out of the tumour nest. Three steps, all
+          pointing the same way, so the honest one-line summary is that TGF-β
+          leads to T-cell exclusion. Every arrow has the same sign, so drawing
+          it as a single arrow looks lossless.
+        </P>
+        <P>Three things vanish when you do.</P>
+        <div className="my-7 grid gap-3">
+          {[
+            [
+              "the contingency",
+              "In a tumour with few fibroblasts, TGF-β excludes nothing. The collapsed version predicts exclusion everywhere, and has deleted the variable that says which patients it applies to.",
+            ],
+            [
+              "the clock",
+              "Deposition and crosslinking take weeks. Blocking TGF-β will not restore infiltration quickly, because the matrix is already built. The one-arrow version implies the effect is as fast as the signal.",
+            ],
+            [
+              "the targets",
+              "Fibroblasts and collagen crosslinking are both druggable, and neither of them is TGF-β. The collapsed diagram offers one node and one intervention; the real chain offers three nodes and at least three.",
+            ],
+          ].map(([label, body]) => (
+            <div
+              key={label}
+              className="border-l-2 border-line pl-4 text-[1.0rem] leading-relaxed"
+            >
+              <span className="font-display font-semibold">{label}.</span>{" "}
+              <span className="text-ink-soft">{body}</span>
+            </div>
+          ))}
+        </div>
+        <P>
+          The simplification kept <em>what happens</em> and discarded where you
+          would intervene, how long it takes, and whether it applies to this
+          patient at all. Nothing in a conventional diagram forces that loss
+          into the open — which is the entire argument for certificates.
         </P>
         <P>
           So each rewriting rule in the calculus carries a{" "}
@@ -594,13 +653,72 @@ export default function Home() {
       </Wide>
 
       <Prose>
-        {/* ---------------- 7 ---------------- */}
+        <P>
+          There is a real inconsistency to flag here, and it is the sort a
+          clinician spots immediately. The calculus is strict on the efficacy
+          side: you may not claim synergy without first declaring a null model
+          against which &ldquo;more than additive&rdquo; means something. Then
+          it adds toxicity up with a plus sign.
+        </P>
+        <P>
+          Combining two agents each carrying one unit of harm can produce at
+          least three different things, and a single number cannot represent
+          any of the distinctions:
+        </P>
+        <div className="my-7 grid gap-3">
+          {[
+            [
+              "same total, different organ",
+              "Two agents at grade 1 in unrelated organs is a workable regimen. Two at grade 1 in the same organ by the same mechanism is a dose hold. Identical scalar, opposite clinical meaning — toxicity is a vector, and a scalar has nowhere to put the organ.",
+            ],
+            [
+              "genuinely more than the sum",
+              "Overlapping mechanism can multiply rather than add. This is exactly the synergy the paper insists on formalising for benefit, left informal for harm — even though shared-mechanism overlap is where it most reliably appears.",
+            ],
+            [
+              "tolerable on paper, inert in practice",
+              "The combination clears its safety threshold only after everything is dose-reduced, so no agent reaches its target concentration and every route is left partially open. No new route was created; the existing cuts simply stopped cutting. This is the common way combinations fail, and a scalar penalty cannot express it at all.",
+            ],
+          ].map(([label, body]) => (
+            <div
+              key={label}
+              className="border-l-2 border-line pl-4 text-[1.0rem] leading-relaxed"
+            >
+              <span className="font-display font-semibold">{label}.</span>{" "}
+              <span className="text-ink-soft">{body}</span>
+            </div>
+          ))}
+        </div>
+        <P>
+          The repair is small and in keeping with the rest of the design: let
+          the cost function carry pairwise interaction terms, exactly as the
+          efficacy side already does, and declare which axis each target loads
+          onto. There is a pleasing symmetry with combination antiretroviral
+          therapy here. In HIV you deliberately choose agents from different
+          mechanistic classes so that one mutation cannot disable two drugs at
+          once. In oncology you want non-overlapping toxicity profiles so that
+          one dose-limiting toxicity cannot disable two drugs at once. Same
+          structural requirement — independence — applied on the cost side
+          rather than the benefit side.
+        </P>
+
+        {/* ---------------- 8 ---------------- */}
         <SectionHeading n="8" id="upward" title="Bigger is not safer" />
         <P>
           Static hitting sets have a comfortable property: any superset of a
-          cut is still a cut. Adaptation destroys this (Proposition 7.8).
-          Because guards test the intervention itself, <em>adding a drug can
-          create the escape route you didn&apos;t block</em>.
+          cut is still a cut. Add more targets and you certainly do not lose
+          coverage — you only pay more. That property is what makes the search
+          tractable, because it lets you discard vast regions of the space at a
+          stroke.
+        </P>
+        <P>
+          Adaptation destroys it (Proposition 7.8). Because guards test the
+          intervention itself, <em>adding a drug can create the escape route
+          you did not block</em>. The important word is <em>create</em>: this
+          is not diminishing returns, and it is not merely a cost objection. It
+          is reversal. A larger intervention can be strictly worse than the
+          smaller one it contains, on the outcome you care about, not just on
+          the bill.
         </P>
       </Prose>
 
@@ -713,7 +831,7 @@ export default function Home() {
         </P>
         <P>
           <Term>Reciprocal intervention-induced escape.</Term> In
-          PTEN-deficient prostate cancer, AR and PI3K signaling suppress each
+          PTEN-deficient prostate cancer, AR and PI3K signalling suppress each
           other: inhibit either and the other rises. Two individually
           plausible controllers, each arming the other&apos;s escape:
         </P>
@@ -737,8 +855,116 @@ export default function Home() {
       </Wide>
 
       <Prose>
-        {/* ---------------- 10 ---------------- */}
-        <SectionHeading n="11" id="toolchain" title="From algebra to toolchain" />
+        <P>
+          This diagnostic is, in practice, the most immediately useful thing
+          the framework produces: mutually reinforcing targets have to be
+          covered together or the effort is wasted, and unlike almost
+          everything else here it is cheap to compute — you are looking for
+          cycles, not solving a hitting-set problem.
+        </P>
+        <P>
+          Two clarifications keep it honest. The first is that the same cycle
+          arises from opposite underlying biology.{" "}
+          <Term>Mutual inhibition</Term> is the common case: two arms suppress
+          each other, so blocking one releases the other. AR and PI3K are one
+          instance; the T-helper lineages are another, where Th1 and Th2
+          cross-inhibit, and Treg and Th17 more sharply still, since their
+          master regulators antagonise directly. Suppress one and you do not
+          get less of the response — you get the other arm.{" "}
+          <Term>Mutual arming</Term> is the case where each sustains the other,
+          so removing one deprives the other of support. Opposite loop signs;
+          identical consequence for combination design, because what the graph
+          records is not the biological sign but the response to intervention.
+        </P>
+        <Note label="Relation to prior work" tone="warn">
+          Finding strongly connected components and covering each as a unit is
+          formally close to stable-motif control and feedback-vertex-set
+          control, and that literature is already cited in the paper. The
+          difference has to be stated explicitly or a reader will reasonably
+          file this as a rediscovery. Those methods compute their components on
+          the <em>regulatory wiring diagram</em> — who regulates whom. The
+          graph here is different: its vertices are controllable targets and
+          its edge <K>{"A \\to B"}</K> means <em>inhibiting A enables or
+          amplifies B</em>. That is a derived object, defined by response to
+          intervention rather than by regulatory topology, and two systems with
+          the same wiring diagram can have different ones. The claim to
+          novelty rests entirely on that distinction, so it belongs up front
+          rather than in a discussion section.
+        </Note>
+      </Prose>
+
+      <Prose>
+        {/* ---------------- 11 ---------------- */}
+        <SectionHeading
+          n="11"
+          id="induction"
+          title="Two different things are called resistance"
+        />
+        <P>
+          Everything so far has assumed one story about where a new route comes
+          from: the treatment <em>creates</em> it. Block BRAF, feedback
+          releases, EGFR comes up, a route that did not exist now does. Call
+          this <Term>induction</Term>. It is real, it is what the 2012 papers
+          demonstrated, and it is what the closure operator models — the same
+          cell, over hours to days, with no genetics involved.
+        </P>
+        <P>
+          But a great deal of resistance is not that. The cell that survives
+          was already different before the first dose. The drug did not build
+          the route; it removed the competition. Call this{" "}
+          <Term>selection</Term>. Nothing was induced — a rare variant was
+          revealed by killing everything around it.
+        </P>
+        <P>
+          The two are experimentally easy to confuse and strategically
+          opposite. If the route was <em>induced</em>, it is a property of a
+          state, that state is reversible, timing is your lever, and
+          intermittent dosing is a coherent idea. If the route was{" "}
+          <em>selected</em>, the variant is already present, coverage has to be
+          up front rather than sequential, and what you use first constrains
+          what still works later. Identical observation after the fact;
+          opposite prescription.
+        </P>
+        <P>
+          This matters for the calculus specifically, because its central
+          object cannot tell them apart. A closure rule says &ldquo;under
+          intervention <K>U</K> in context <K>c</K>, route{" "}
+          <K>r</K> becomes available.&rdquo; That sentence is true in both
+          worlds and means different things in each. The fixed point has no
+          notion of <em>how much</em> of the population holds the route, and no
+          notion of the difference between hours and months.
+        </P>
+        <Note label="The honest answer" tone="warn">
+          It is usually both, in sequence. Blockade releases feedback within
+          hours; a drug-tolerant, non-genetic state carries some cells through
+          the bottleneck; and genuinely resistant clones then emerge from that
+          surviving pool over months. The induced state is what buys selection
+          the material to work on. A framework that models only the first act
+          will systematically mistime the second.
+        </Note>
+        <P>
+          What would it take to fix rather than caveat this? Two changes, both
+          structural. The state would have to be a <em>population</em> rather
+          than a cell, so route availability becomes a fraction instead of a
+          truth value. And the model needs two clocks, because induction runs
+          in hours and selection in months, whereas the fixed point as defined
+          has no time in it at all beyond per-rule delays.
+        </P>
+        <P>
+          Encouragingly, that same difference in timescale is what
+          distinguishes them experimentally, which puts the question inside the
+          paper&apos;s own information-gain framing. Bulk measurements before
+          and after treatment cannot separate the two — both yield &ldquo;the
+          route is present now and was not before.&rdquo; A pre-treatment
+          single-cell or lineage-barcoding measurement can: if the escape route
+          is already present in some subpopulation before the first dose, it
+          was selection. That is a concrete, decision-changing experiment, and
+          it is exactly the kind the framework claims it should be able to
+          nominate.
+        </P>
+
+        {/* ---------------- 12 ---------------- */}
+        <SectionHeading n="12" id="toolchain" title="From algebra to toolchain" />
         <P>
           The intended implementation is a compiler: pathway sources (SBML,
           BioPAX, rule-based models, perturbation tables) in; typed terms with
@@ -772,7 +998,73 @@ solve robust_cut minimize toxicity + uncertainty + cardinality`}</CodeBlock>
         </P>
 
         {/* ---------------- 11 ---------------- */}
-        <SectionHeading n="12" id="honesty" title="What would falsify it" />
+        <SectionHeading
+          n="13"
+          id="limits"
+          title="Where the abstraction gives out"
+        />
+        <P>
+          Three assumptions have been carrying more weight than the exposition
+          so far has admitted. Each is defensible; none is free; and it is
+          worth knowing which questions each one disqualifies you from asking.
+        </P>
+        <P>
+          <Term>Monotonicity is the strongest of them.</Term> Recall the
+          assumption from earlier: more capability never hurts. A great deal of
+          signalling is not like that. TNF is protective at low levels and
+          lethal at high ones. Interleukin-2 at low dose expands regulatory
+          T cells and at high dose expands effectors — two opposite drug
+          programmes built on the same molecule. Even antibody assays have the
+          prozone effect, where more antibody yields less measured signal.
+          Biology is full of optima, and an optimum is the one shape a monotone
+          function cannot have. T-cell activation fails at both ends of the
+          same axis: too little signal gives anergy, too much gives
+          activation-induced cell death, with the useful region in between.
+        </P>
+        <P>
+          The uncomfortable part is that this is not confined to some other
+          corner of biology. It occurs in the very pathway this walkthrough is
+          built on. At low occupancy, RAF inhibitors <em>increase</em> ERK
+          signalling in cells with wild-type BRAF, through dimer
+          transactivation — more drug producing more of the thing it is meant
+          to block. The clinical consequence is not subtle: cutaneous squamous
+          cell carcinomas and keratoacanthomas in patients on RAF-inhibitor
+          monotherapy, arising in cells with RAS mutations. A monotone route
+          model cannot express a mechanism in which partial inhibition is worse
+          than none, and this one is documented in the drug labelling of the
+          example under discussion.
+        </P>
+        <P>
+          <Term>An edge is not a neutral object either.</Term> The calculus is
+          scrupulous about declaring what a <em>rewrite</em> preserves, and
+          silent about what an <em>edge</em> is entitled to represent. Those
+          should be the same discipline. An arrow is a reasonable summary of a
+          transcriptional dependency. It is a poor summary of a mechanosensitive
+          multivalent interface: what detaches when a T cell disengages from a
+          target is not one bond but a whole contact — receptor and coreceptor,
+          adhesion molecules, costimulatory and inhibitory pairs — each with its
+          own density, reach, and force-dependent lifetime, measured as a
+          distribution across a population rather than a value. Bond lifetime
+          there is itself non-monotone in applied force. The ask is not that the
+          model absorb mechanics; it is that a certificate declare which class
+          of interaction a given edge is licensed to stand for.
+        </P>
+        <P>
+          <Term>And the model contains exactly one cell.</Term> Every node in
+          the worked example is a protein inside a single tumour cell, yet one
+          of the best-documented resistance routes in the same disease and the
+          same year runs through a different cell entirely: stromal fibroblasts
+          secreting a growth factor that rescues the tumour cell. Structurally
+          this is the kind of thing the language handles well — it is a
+          conjunction, and conjunctions are native. It simply cannot be stated,
+          because one conjunct originates outside the cell being represented.
+          The same omission hides a second one: environmental state is not
+          uniform, so a real tumour has regions where a route is open and
+          regions where it is not, while the route family here is a single list
+          for the whole thing.
+        </P>
+
+        <SectionHeading n="14" id="honesty" title="What would falsify it" />
         <P>
           The proposal comes with its own failure criteria: if
           objective-equivalent reductions routinely fail under held-out
@@ -802,7 +1094,7 @@ solve robust_cut minimize toxicity + uncertainty + cardinality`}</CodeBlock>
         </Note>
 
         {/* ---------------- glossary ---------------- */}
-        <SectionHeading n="13" id="glossary" title="Glossary" />
+        <SectionHeading n="15" id="glossary" title="Glossary" />
         <dl className="mt-8 grid gap-x-8 gap-y-5 sm:grid-cols-2">
           {GLOSSARY.map(([term, def]) => (
             <div key={term}>

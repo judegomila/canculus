@@ -91,8 +91,34 @@ export interface ClosureResult {
   trace: ClosureStep[];
   /** Esc(U, c): closed routes disjoint from U (Def. 7.4). */
   escape: Route[];
-  /** Esc(U, c) = ∅ (Def. 7.5). */
+  /**
+   * Esc(U, c) = ∅ (Def. 7.5). Read this as "no escape route was found in the
+   * declared model", never as "no escape route exists": with an empty rule
+   * set every intervention is trivially robust. Report it alongside
+   * `rulesEncoded` so coverage is distinguishable from ignorance.
+   */
   robust: boolean;
+  /**
+   * How many adaptation rules could fire in this context at all — that is,
+   * how many escape mechanisms have actually been written down for this
+   * tissue. Zero means the verdict carries no evidential weight.
+   */
+  rulesEncoded: number;
+}
+
+/**
+ * Rules whose context guard can be satisfied in context c by some admissible
+ * intervention. Evaluated optimistically, with every capability targeted, so
+ * this counts mechanisms encoded for the tissue rather than mechanisms
+ * triggered by one particular candidate.
+ */
+export function rulesEncodedFor(
+  rules: readonly AdaptationRule[],
+  universe: readonly Cap[],
+  ctx: Context,
+): AdaptationRule[] {
+  const everything = new Set(universe);
+  return rules.filter((r) => r.guard(everything, ctx));
 }
 
 /**
@@ -104,6 +130,8 @@ export function adaptationClosure(
   rules: readonly AdaptationRule[],
   U: ReadonlySet<Cap>,
   ctx: Context,
+  /** Universe, used only to report how many rules exist for this context. */
+  universe?: readonly Cap[],
 ): ClosureResult {
   const family = new Map<string, Route>();
   for (const r of R0) family.set(routeKey(r), [...r].sort());
@@ -135,7 +163,14 @@ export function adaptationClosure(
 
   const closed = [...family.values()];
   const escape = closed.filter((r) => disjoint(r, U));
-  return { closed, trace, escape, robust: escape.length === 0 };
+  const caps = universe ?? [...new Set(rules.flatMap((r) => r.consequences.flat()))];
+  return {
+    closed,
+    trace,
+    escape,
+    robust: escape.length === 0,
+    rulesEncoded: rulesEncodedFor(rules, caps, ctx).length,
+  };
 }
 
 /* ------------------------------------------------------------------ */
@@ -208,7 +243,13 @@ export function minimalRobustCuts(sys: RouteRuleSystem): Cap[][] {
   const robustSets: Cap[][] = [];
   const minimal: Cap[][] = [];
   for (const U of subsetsBySize(sys.universe)) {
-    const res = adaptationClosure(sys.baseline, sys.rules, new Set(U), sys.ctx);
+    const res = adaptationClosure(
+      sys.baseline,
+      sys.rules,
+      new Set(U),
+      sys.ctx,
+      sys.universe,
+    );
     if (!res.robust) continue;
     robustSets.push(U);
     if (!robustSets.some((m) => !sameRoute(m, U) && isSubset(m, U))) {
@@ -240,7 +281,13 @@ export function rankedRobustCuts(
   const out: ScoredCut[] = [];
   for (const U of subsetsBySize(sys.universe)) {
     if (U.length === 0) continue;
-    const res = adaptationClosure(sys.baseline, sys.rules, new Set(U), sys.ctx);
+    const res = adaptationClosure(
+      sys.baseline,
+      sys.rules,
+      new Set(U),
+      sys.ctx,
+      sys.universe,
+    );
     if (res.robust) out.push({ cut: U, cost: cutCost(U, costs), robust: true });
   }
   // keep only inclusion-minimal robust cuts, then sort by cost

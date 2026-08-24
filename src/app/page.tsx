@@ -131,6 +131,17 @@ export default function Home() {
           walkthrough, and it is worth stepping through before any mathematics
           appears.
         </P>
+        <P>
+          This story does have an ending, and it is worth knowing in advance
+          rather than being kept as a reveal. The mechanism was identified, a
+          combination was designed against it, that combination was tested in a
+          phase 3 trial, and it has been approved and is standard of care in
+          exactly this disease. So the question the mathematics below has to
+          answer is not whether the biology can be figured out — it was, by
+          experiment. The question is whether the reasoning that got there can
+          be made <em>systematic</em>, so the next case does not require the
+          same decade.
+        </P>
       </Prose>
 
       <Wide>
@@ -618,13 +629,32 @@ export default function Home() {
         </P>
         <Eq>{"\\{M\\}, \\quad \\{E\\}, \\quad \\{B,G\\}, \\quad \\{B,R\\}, \\quad \\{B,C\\}"}</Eq>
         <P>
-          The algebra has separated two design patterns a tumor board would
-          recognize instantly: <em>hit a common downstream bottleneck</em> (M
+          The algebra has separated two design patterns a tumour board would
+          recognise instantly: <em>hit a common downstream bottleneck</em> (M
           or E), or <em>keep the upstream target and add a blocker specific to
           the induced bypass</em> (B plus G, R, or C). Which is preferable is
           not a question logic can answer — which is exactly the point of the
           next section.
         </P>
+        <Note label="What happened in the clinic">
+          The second pattern, <K>{"\\{B, G\\}"}</K> — inhibit BRAF, and block
+          the receptor whose release the inhibition causes — is not a
+          hypothetical. It is encorafenib plus cetuximab, which the FDA
+          approved for BRAF-V600E metastatic colorectal cancer in 2020 on the
+          strength of the BEACON CRC phase 3 trial, and which has since been
+          extended into first-line use in combination with chemotherapy. A
+          BRAF inhibitor paired with an EGFR antibody is now standard of care
+          in the disease where the BRAF inhibitor alone had failed.
+          <br />
+          <br />
+          Two honest qualifications. The clinical combination was found by
+          mechanistic experiment, not by running this algebra — the calculus is
+          being checked against a known answer, which is the right first test
+          but not evidence of prospective power. And the derivation above holds
+          within a deliberately tiny model: six capabilities, one rule. What it
+          shows is that the formalism, given the mechanism, reaches the
+          combination that worked, and rejects the monotherapy that did not.
+        </Note>
 
         {/* ---------------- 6 ---------------- */}
         <SectionHeading n="7" id="penalties" title="Logic proposes, pharmacology disposes" />
@@ -724,6 +754,38 @@ export default function Home() {
           smaller one it contains, on the outcome you care about, not just on
           the bill.
         </P>
+        <P>
+          The clinical literature supplies a case in the same disease with the
+          same drugs. BEACON CRC did not only test the doublet; it also tested
+          a triplet, adding a MEK inhibitor to the same backbone. On the
+          reasoning of the previous sections that should help — MEK is the
+          shared downstream segment of both routes. In the updated analysis,
+          median overall survival was <strong>9.3 months for the triplet and
+          9.3 months for the doublet</strong>. Response rate was somewhat
+          higher with the triplet (26.8% against 19.5%); so was grade 3 or
+          worse toxicity (65.8% against 57.4%); and dose intensity fell
+          (encorafenib delivered at 91% of intended in the triplet against 98%
+          in the doublet). The doublet became the standard of care.
+        </P>
+        <Note label="What this does and does not demonstrate" tone="warn">
+          It is tempting to file this as a clinical confirmation of
+          non-monotonicity, and it is worth resisting. The triplet did not lose
+          — it tied, at a higher cost. The direct comparison in the original
+          analysis gave a hazard ratio of 0.79 with a confidence interval
+          spanning 1, so the trial was not powered to establish that the larger
+          regimen was worse, only that it was not better.
+          <br />
+          <br />
+          What it does demonstrate is the weaker and still important claim:{" "}
+          <em>a superset of a working combination is not automatically an
+          improvement</em>, and the mechanism of failure here was not a new
+          escape route but the third item on the toxicity list above — the
+          combination cleared its safety bar only at reduced dose intensity, so
+          the added agent bought less inhibition than it promised. Route
+          reversal and delivery failure are different mechanisms with the same
+          clinical signature, and a framework that models only the first will
+          misattribute the second.
+        </Note>
       </Prose>
 
       <Wide>
@@ -844,6 +906,14 @@ export default function Home() {
           <K>N</K> rules&rdquo; — so that a claim about coverage is
           syntactically distinct from a confession of ignorance. Those are
           different objects and they should never share a field.
+          <br />
+          <br />
+          For a sense of how large that gap routinely is: in pooled series of
+          melanoma biopsies taken at progression on BRAF inhibitors, the
+          single largest category of resistance mechanism is{" "}
+          <em>unidentified</em> — larger than any named mechanism. A rule set
+          is not a slightly incomplete inventory of how a tumour can escape. It
+          is a minority of one.
         </Note>
         <P>
           With both rule sets encoded, the comparison gets sharper than the
@@ -915,18 +985,33 @@ export default function Home() {
         </P>
         <Note label="Relation to prior work" tone="warn">
           Finding strongly connected components and covering each as a unit is
-          formally close to stable-motif control and feedback-vertex-set
-          control, and that literature is already cited in the paper. The
-          difference has to be stated explicitly or a reader will reasonably
-          file this as a rediscovery. Those methods compute their components on
-          the <em>regulatory wiring diagram</em> — who regulates whom. The
-          graph here is different: its vertices are controllable targets and
-          its edge <K>{"A \\to B"}</K> means <em>inhibiting A enables or
-          amplifies B</em>. That is a derived object, defined by response to
-          intervention rather than by regulatory topology, and two systems with
-          the same wiring diagram can have different ones. The claim to
-          novelty rests entirely on that distinction, so it belongs up front
-          rather than in a discussion section.
+          formally close to existing methods, and the distinction has to be
+          stated explicitly or a reader will reasonably file this as a
+          rediscovery.
+          <br />
+          <br />
+          The cleanest contrast is with <em>feedback vertex set</em> control,
+          which operates on the regulatory digraph — who regulates whom —
+          using topology alone. The graph here is a different object: its
+          vertices are controllable targets and its edge{" "}
+          <K>{"A \\to B"}</K> means <em>inhibiting A enables or amplifies
+          B</em>. That is derived from response to intervention, not read off
+          regulatory structure, and two systems with identical wiring diagrams
+          can produce different ones.
+          <br />
+          <br />
+          Two concessions belong alongside that claim. The contrast is weaker
+          against <em>stable-motif</em> control, which works on the expanded
+          network and does consult the update functions, so it is not purely
+          topological either. And the idea of a matrix of
+          perturbation-to-response relationships is not new: Modular Response
+          Analysis has inferred exactly such objects from systematic
+          perturbation data for two decades. The defensible novelty is
+          narrower than &ldquo;a new graph&rdquo; — it is the use of that
+          response structure as the domain of a fixed-point closure, so cycles
+          become escape coalitions that a cut must cover. That is worth
+          stating precisely, because the overclaim is easy to make and easy to
+          shoot down.
         </Note>
       </Prose>
 
@@ -1049,29 +1134,45 @@ solve robust_cut minimize toxicity + uncertainty + cardinality`}</CodeBlock>
         <P>
           <Term>Monotonicity is the strongest of them.</Term> Recall the
           assumption from earlier: more capability never hurts. A great deal of
-          signalling is not like that. TNF is protective at low levels and
-          lethal at high ones. Interleukin-2 at low dose expands regulatory
-          T cells and at high dose expands effectors — two opposite drug
-          programmes built on the same molecule. Even antibody assays have the
-          prozone effect, where more antibody yields less measured signal.
-          Biology is full of optima, and an optimum is the one shape a monotone
-          function cannot have. T-cell activation fails at both ends of the
-          same axis: too little signal gives anergy, too much gives
-          activation-induced cell death, with the useful region in between.
+          biology has optima, and an optimum is the one shape a monotone
+          function cannot have — T-cell activation fails at both ends of the
+          same axis, too little signal giving anergy and too much giving
+          activation-induced death, with the useful region in between.
         </P>
         <P>
-          The uncomfortable part is that this is not confined to some other
-          corner of biology. It occurs in the very pathway this walkthrough is
-          built on. At low occupancy, RAF inhibitors <em>increase</em> ERK
-          signalling in cells with wild-type BRAF, through dimer
-          transactivation — more drug producing more of the thing it is meant
-          to block. The clinical consequence is not subtle: cutaneous squamous
-          cell carcinomas and keratoacanthomas in patients on RAF-inhibitor
-          monotherapy, arising in cells with RAS mutations. A monotone route
-          model cannot express a mechanism in which partial inhibition is worse
-          than none, and this one is documented in the drug labelling of the
-          example under discussion.
+          It is worth being careful here, though, because the examples usually
+          reached for do not all mean the same thing, and the differences
+          matter for what a model has to represent. Interleukin-2 expanding
+          regulatory T cells at low dose and effectors at high dose is often
+          called a non-monotone response; it is better described as a{" "}
+          <em>selectivity window</em>, since each population&apos;s own
+          dose-response is an ordinary monotone curve and only the
+          half-maximal point differs, set by receptor density. The prozone
+          effect, where more antibody yields less measured signal, is real and
+          clean — but it is a measurement artefact rather than a biological
+          response; the underlying quantity is monotone and only the readout is
+          not. Both are instructive, and neither is quite a biological optimum.
         </P>
+        <P>
+          The genuinely awkward case is closer to home. RAF inhibitors do not
+          only inhibit: in cells carrying <em>wild-type</em> BRAF, they promote
+          RAF dimerisation and thereby <em>increase</em> ERK signalling — the
+          drug producing more of the thing it is meant to block. The clinical
+          consequence is not subtle. Patients on RAF-inhibitor monotherapy
+          develop cutaneous squamous cell carcinomas and keratoacanthomas,
+          arising in cells with RAS mutations, and the encorafenib label — the
+          BRAF inhibitor in the trial discussed above — carries an explicit
+          warning for tumour promotion in BRAF wild-type tumours.
+        </P>
+        <Note label="Stated precisely">
+          This is a paradox of <em>cell context</em>, not a bell-shaped curve
+          in the treated tumour. In the BRAF-V600E cells the drug is aimed at,
+          which signal as monomers, the dose response is ordinary monotone
+          inhibition. The reversal occurs in bystander cells with wild-type
+          BRAF and mutant RAS. That is arguably worse for the formalism than a
+          simple optimum would be: the sign of an intervention depends on which
+          cell you are asking about, and the model contains only one cell.
+        </Note>
         <P>
           <Term>An edge is not a neutral object either.</Term> The calculus is
           scrupulous about declaring what a <em>rewrite</em> preserves, and
@@ -1089,17 +1190,28 @@ solve robust_cut minimize toxicity + uncertainty + cardinality`}</CodeBlock>
         </P>
         <P>
           <Term>And the model contains exactly one cell.</Term> Every node in
-          the worked example is a protein inside a single tumour cell, yet one
-          of the best-documented resistance routes in the same disease and the
-          same year runs through a different cell entirely: stromal fibroblasts
-          secreting a growth factor that rescues the tumour cell. Structurally
-          this is the kind of thing the language handles well — it is a
-          conjunction, and conjunctions are native. It simply cannot be stated,
-          because one conjunct originates outside the cell being represented.
-          The same omission hides a second one: environmental state is not
+          the worked example is a protein inside a single tumour cell. Yet a
+          well-known proposal from the same year and the same disease puts a
+          resistance route in a different cell entirely: stromal fibroblasts
+          secreting a growth factor that rescues the tumour cell. Its status is
+          instructive — two 2012 studies reported supporting clinical
+          correlates, a later attempt to validate the tissue biomarker did not
+          reproduce it, and the mechanism is absent from the large genomic
+          resistance cohorts. Call it proposed and plausible rather than
+          established. Either way the structural point stands: the language
+          could express such a route perfectly well, and the model simply has
+          nowhere to put a component that lives outside the cell being
+          represented.
+        </P>
+        <P>
+          The same omission conceals a second one. Environmental state is not
           uniform, so a real tumour has regions where a route is open and
-          regions where it is not, while the route family here is a single list
-          for the whole thing.
+          regions where it is not, while the route family here is one list for
+          the whole thing. The melanoma resistance literature makes the cost of
+          that assumption concrete: among patients with more than one
+          progression biopsy, almost all had <em>different or unidentified</em>{" "}
+          drivers in different lesions. A single route list per tumour is not a
+          simplification of that situation so much as a different situation.
         </P>
 
         <SectionHeading n="14" id="honesty" title="What would falsify it" />

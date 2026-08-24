@@ -8,7 +8,9 @@ import {
   CRC_CONTEXT,
   MELANOMA_CONTEXT,
   brafSystem,
+  r0,
   r1,
+  rMel,
 } from "@/lib/models";
 import { PathwayDiagram } from "../PathwayDiagram";
 import { Chip, ClosureVerdict, RouteCard, displayOrder } from "./ui";
@@ -41,6 +43,10 @@ export function ClosureLab() {
   );
 
   const bypassInFamily = res.closed.some((r) => routeKey(r) === routeKey(r1));
+  const melEscapeInFamily = res.closed.some(
+    (r) => routeKey(r) === routeKey(rMel),
+  );
+  const inducedInFamily = bypassInFamily || melEscapeInFamily;
 
   const toggle = (id: string) =>
     setU((s) => {
@@ -99,8 +105,16 @@ export function ClosureLab() {
       <div className="rounded-md border border-line-soft bg-paper p-2">
         <PathwayDiagram
           inhibited={U}
-          bypassEnabled={bypassInFamily}
-          bypassPossible={lineage === "CRC"}
+          bypassEnabled={inducedInFamily}
+          bypassPossible
+          receptorFreeEscape={lineage === "melanoma"}
+          inducedLabel={
+            lineage === "melanoma"
+              ? melEscapeInFamily
+                ? "INDUCED ROUTE — MAPK REACTIVATION, IN THE FAMILY"
+                : "LATENT MELANOMA ESCAPE — NOT YET A ROUTE"
+              : undefined
+          }
           onToggle={toggle}
         />
       </div>
@@ -119,8 +133,14 @@ export function ClosureLab() {
                   key={`${uKey}-${routeKey(r)}`}
                   route={r}
                   hit={!disjoint(r, U)}
-                  induced={routeKey(r) === routeKey(r1)}
-                  label={routeKey(r) === routeKey(r1) ? "r₁" : "r₀"}
+                  induced={routeKey(r) !== routeKey(r0)}
+                  label={
+                    routeKey(r) === routeKey(r0)
+                      ? "r₀"
+                      : routeKey(r) === routeKey(r1)
+                        ? "r₁"
+                        : "r_mel"
+                  }
                 />
               ))}
             </AnimatePresence>
@@ -214,7 +234,11 @@ export function ClosureLab() {
                       {row.U.length ? `{${row.U.join(",")}}` : "∅"}
                     </td>
                     <td className="py-2 pr-2 text-ink-soft">
-                      {rowRes.closed.length === 1 ? "{r₀}" : "{r₀, r₁}"}
+                      {rowRes.closed.length === 1
+                        ? "{r₀}"
+                        : lineage === "melanoma"
+                          ? "{r₀, r_mel}"
+                          : "{r₀, r₁}"}
                     </td>
                     <td className="py-2">
                       {rowRes.robust ? (
@@ -229,9 +253,20 @@ export function ClosureLab() {
             </tbody>
           </table>
           <p className="mt-3 font-mono text-[0.72rem] leading-relaxed text-ink-faint">
-            In melanoma context the guard c_CRC is false: every row&apos;s
-            closure stays {"{r₀}"} and {"{B}"} alone is robust (Eq. 58) — same
-            mutation, different control problem.
+            {lineage === "CRC" ? (
+              <>
+                The EGFR guard c_CRC holds here, so inhibiting B opens r₁
+                within hours. Switch lineage to compare.
+              </>
+            ) : (
+              <>
+                The EGFR guard is false in melanoma — but that does not make{" "}
+                {"{B}"} safe. A second rule encodes MAPK reactivation through
+                RAS/CRAF, which needs no receptor and runs on a scale of weeks
+                rather than hours. The escape is slower and mechanistically
+                different, not absent.
+              </>
+            )}
           </p>
         </div>
       </div>

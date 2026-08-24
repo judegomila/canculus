@@ -9,6 +9,14 @@ export interface PathwayDiagramProps {
   bypassEnabled: boolean;
   /** dim the whole bypass strip (e.g. melanoma context) */
   bypassPossible?: boolean;
+  /**
+   * An induced route that runs through RAS/CRAF without the receptor —
+   * melanoma's slower MAPK-reactivation escape. Rendered on the same strip
+   * as the EGFR bypass, minus the receptor.
+   */
+  receptorFreeEscape?: boolean;
+  /** caption for the induced strip, overriding the EGFR-specific default. */
+  inducedLabel?: string;
   onToggle?: (cap: string) => void;
 }
 
@@ -132,11 +140,16 @@ export function PathwayDiagram({
   inhibited,
   bypassEnabled,
   bypassPossible = true,
+  receptorFreeEscape = false,
+  inducedLabel,
   onToggle,
 }: PathwayDiagramProps) {
+  const escapeCaps = receptorFreeEscape
+    ? ["R", "C", "M", "E"]
+    : ["G", "R", "C", "M", "E"];
   const baselineLive = ["B", "M", "E"].every((v) => !inhibited.has(v));
   const bypassLive =
-    bypassEnabled && ["G", "R", "C", "M", "E"].every((v) => !inhibited.has(v));
+    bypassEnabled && escapeCaps.every((v) => !inhibited.has(v));
   const survives = baselineLive || bypassLive;
   const latent = !bypassEnabled;
 
@@ -202,11 +215,12 @@ export function PathwayDiagram({
           strokeDasharray={latent ? "6 5" : undefined}
         />
         <text x={72} y={184} fontSize={10.5} fontFamily="var(--font-mono)" fill={bypassEnabled ? "var(--adapt)" : "var(--ink-faint)"} letterSpacing="0.14em">
-          {bypassPossible
-            ? bypassEnabled
-              ? "INDUCED ROUTE r1 — IN THE FAMILY"
-              : "LATENT BYPASS — NOT YET A ROUTE"
-            : "BYPASS ABSENT IN THIS LINEAGE"}
+          {inducedLabel ??
+            (bypassPossible
+              ? bypassEnabled
+                ? "INDUCED ROUTE r1 — IN THE FAMILY"
+                : "LATENT BYPASS — NOT YET A ROUTE"
+              : "BYPASS ABSENT IN THIS LINEAGE")}
         </text>
       </g>
 
@@ -217,7 +231,9 @@ export function PathwayDiagram({
 
       {/* bypass edges */}
       <g opacity={bypassPossible ? 1 : 0.35}>
-        <Edge d={`M ${146} ${BY} H ${234}`} live={bypassLive} latent={latent} />
+        {!receptorFreeEscape && (
+          <Edge d={`M ${146} ${BY} H ${234}`} live={bypassLive} latent={latent} />
+        )}
         <Edge d={`M ${286} ${BY} H ${374}`} live={bypassLive} latent={latent} />
         {/* CRAF rejoins MEK */}
         <Edge
@@ -225,19 +241,28 @@ export function PathwayDiagram({
           live={bypassLive}
           latent={latent}
         />
-        {/* ERK ⊣ EGFR negative feedback */}
-        <path
-          d={`M ${480} ${TY + 30} C ${470} ${190}, ${300} ${255}, ${152} ${BY + 6}`}
-          fill="none"
-          stroke="var(--cut)"
-          strokeWidth={1.6}
-          strokeDasharray="3 5"
-          markerEnd="url(#tbar)"
-          opacity={0.85}
-        />
-        <text x={250} y={292} fontSize={10.5} fontFamily="var(--font-mono)" fill="var(--cut)">
-          ERK ⊣ EGFR negative feedback
-        </text>
+        {/* ERK ⊣ EGFR negative feedback — only the CRC loop uses it */}
+        {!receptorFreeEscape && (
+          <>
+            <path
+              d={`M ${480} ${TY + 30} C ${470} ${190}, ${300} ${255}, ${152} ${BY + 6}`}
+              fill="none"
+              stroke="var(--cut)"
+              strokeWidth={1.6}
+              strokeDasharray="3 5"
+              markerEnd="url(#tbar)"
+              opacity={0.85}
+            />
+            <text x={250} y={292} fontSize={10.5} fontFamily="var(--font-mono)" fill="var(--cut)">
+              ERK ⊣ EGFR negative feedback
+            </text>
+          </>
+        )}
+        {receptorFreeEscape && (
+          <text x={100} y={292} fontSize={10.5} fontFamily="var(--font-mono)" fill="var(--adapt)">
+            MAPK reactivation via RAS/CRAF — no receptor needed, weeks to months
+          </text>
+        )}
       </g>
 
       {/* survival box */}
@@ -291,8 +316,8 @@ export function PathwayDiagram({
             id={n.id}
             label={n.label}
             inhibited={inhibited.has(n.id)}
-            live={bypassLive}
-            latent={latent}
+            live={bypassLive && escapeCaps.includes(n.id)}
+            latent={latent || !escapeCaps.includes(n.id)}
             onToggle={bypassPossible ? onToggle : undefined}
           />
         ))}

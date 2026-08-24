@@ -19,6 +19,7 @@ import {
   brafSystem,
   r0,
   r1,
+  rMel,
   reciprocalPairSystem,
   upwardClosureCounterexample,
 } from "./models";
@@ -115,11 +116,77 @@ describe("adaptation closure reproduces Table 4", () => {
     }
   });
 
-  it("melanoma context: guard never fires, {B} alone is robust (Eq. 58)", () => {
+  it("melanoma: the EGFR guard is false, so r1 never enters the family", () => {
     const mel = brafSystem(MELANOMA_CONTEXT);
-    const res = adaptationClosure(mel.baseline, mel.rules, new Set(["B"]), mel.ctx);
-    expect(keys(res.closed)).toEqual(keys([r0]));
-    expect(res.robust).toBe(true);
+    const res = adaptationClosure(
+      mel.baseline,
+      mel.rules,
+      new Set(["B"]),
+      mel.ctx,
+      mel.universe,
+    );
+    expect(keys(res.closed)).not.toContain(routeKey(r1));
+  });
+
+  /**
+   * Guards against regressing to the paper's Eq. 58 reading, where melanoma
+   * looked adaptation-robust under {B}. That verdict came from an empty rule
+   * set, not from biology: relapse on BRAF-inhibitor monotherapy in melanoma
+   * is near-universal. With the reactivation rule encoded, {B} correctly
+   * fails — just on a slower clock.
+   */
+  it("melanoma: {B} is NOT robust — it opens MAPK reactivation instead", () => {
+    const mel = brafSystem(MELANOMA_CONTEXT);
+    const res = adaptationClosure(
+      mel.baseline,
+      mel.rules,
+      new Set(["B"]),
+      mel.ctx,
+      mel.universe,
+    );
+    expect(keys(res.closed)).toEqual(keys([r0, rMel]));
+    expect(res.robust).toBe(false);
+    expect(keys(res.escape)).toEqual([routeKey(rMel)]);
+  });
+
+  it("melanoma escape is slow: {B} holds for weeks, then fails", () => {
+    const mel = brafSystem(MELANOMA_CONTEXT);
+    const U = new Set(["B"]);
+    expect(robustAtHorizon(mel, U, 168)).toBe(true); // one week
+    expect(robustAtHorizon(mel, U, 2160)).toBe(false); // three months
+  });
+
+  it("reports how many rules are encoded, so silence is not read as safety", () => {
+    const mel = brafSystem(MELANOMA_CONTEXT);
+    const crc = brafSystem();
+    const melRes = adaptationClosure(
+      mel.baseline,
+      mel.rules,
+      new Set(["B"]),
+      mel.ctx,
+      mel.universe,
+    );
+    const crcRes = adaptationClosure(
+      crc.baseline,
+      crc.rules,
+      new Set(["B"]),
+      crc.ctx,
+      crc.universe,
+    );
+    expect(melRes.rulesEncoded).toBe(1);
+    expect(crcRes.rulesEncoded).toBe(1);
+
+    // A context with no encoded mechanisms must not report coverage.
+    const bare = brafSystem({ name: "unmodelled tissue", flags: {} });
+    const bareRes = adaptationClosure(
+      bare.baseline,
+      bare.rules,
+      new Set(["B"]),
+      bare.ctx,
+      bare.universe,
+    );
+    expect(bareRes.robust).toBe(true);
+    expect(bareRes.rulesEncoded).toBe(0);
   });
 });
 

@@ -72,6 +72,36 @@ export function egfrRule(
   };
 }
 
+/**
+ * Melanoma escape, on a much slower clock (§11.4 of this walkthrough).
+ *
+ * The paper's example encodes only the colorectal EGFR bypass, which makes
+ * {B} look adaptation-robust in melanoma. That verdict is an artefact of an
+ * empty rule set, not a biological finding: relapse on BRAF-inhibitor
+ * monotherapy in melanoma is near-universal, which is why BRAF+MEK
+ * combinations displaced monotherapy. Melanoma simply escapes by other
+ * routes — MAPK reactivation through RAS/CRAF (NRAS or MEK1 mutation, BRAF
+ * splice variants, amplification) rather than through the EGFR loop.
+ *
+ * Encoding it here is the difference between a framework that misses a
+ * mechanism and one that catches it with a different time constant.
+ */
+export const rMel: Route = ["R", "C", "M", "E"];
+
+export function melanomaReactivationRule(): AdaptationRule {
+  return {
+    id: "rho_MAPK_reactivation",
+    prereqRoutes: [r0],
+    guard: (U, ctx) => U.has("B") && ctx.flags.lineage === "melanoma",
+    guardLabel: "I_B ∧ c_melanoma",
+    consequences: [rMel],
+    // weeks to months: this is selection of resistant clones and stabilised
+    // drug-tolerant states, not the hours-scale feedback release in CRC.
+    delay: 1440,
+    level: "L3",
+  };
+}
+
 export function brafSystem(
   ctx: Context = CRC_CONTEXT,
   fb: FeedbackParams = DEFAULT_FEEDBACK,
@@ -80,7 +110,7 @@ export function brafSystem(
   return {
     universe: BRAF_CAPS.map((c) => c.id),
     baseline: [r0],
-    rules: [egfrRule(fb, alphaUnderTreatment)],
+    rules: [egfrRule(fb, alphaUnderTreatment), melanomaReactivationRule()],
     ctx,
   };
 }

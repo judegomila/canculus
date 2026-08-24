@@ -597,9 +597,13 @@ export default function Home() {
               alone: the baseline route dies, the guard fires, and the
               EGFR→RAS→CRAF bypass enters the family untouched — the
               &ldquo;cheapest&rdquo; static cut fails its own consequences.
-              Switch the context to melanoma (low EGFR): same mutation, the
-              guard never fires, and {"{B}"} alone is robust. Same driver
-              mutation ≠ same control problem (Eq. 58).
+              Switch the context to melanoma: the EGFR guard is false there, so
+              that particular route never appears — but a second rule encodes
+              MAPK reactivation through RAS/CRAF, which needs no receptor and
+              takes weeks rather than hours. Same driver mutation, different
+              escape, different clock. Watch the verdict line: it reports how
+              many rules are encoded, because &ldquo;no escape found&rdquo; and
+              &ldquo;no escape exists&rdquo; are not the same claim.
             </>
           }
         >
@@ -818,6 +822,39 @@ export default function Home() {
           lineage flag changes the entire cut structure. The formalism&apos;s
           upgrade is the explicit inequality{" "}
           <K>{"\\mathrm{MinCut}(R_0) \\ne \\mathrm{MinCut}(\\mathrm{Cl}_{\\Gamma,c}(R_0, U))"}</K>.
+        </P>
+        <Note label="A correction worth dwelling on" tone="warn">
+          An earlier version of this walkthrough drew the wrong conclusion from
+          that comparison. Because the model encoded only the colorectal EGFR
+          loop, switching to melanoma emptied the rule set and the framework
+          duly reported that inhibiting BRAF alone was robust. That is false as
+          biology — relapse on BRAF-inhibitor monotherapy in melanoma is
+          near-universal, which is why combinations displaced it — and the
+          framework had no way to say so. Its rule set was silent, and silence
+          rendered as safety.
+          <br />
+          <br />
+          This is the failure mode worth naming, because it will recur in any
+          system of this kind: <em>the output of a closure computation is
+          bounded by the mechanisms someone bothered to write down.</em> The
+          repair has two parts, both now in place. Encode the melanoma routes,
+          so the example demonstrates the framework catching a mechanism on a
+          slower clock rather than missing one. And make the verdict carry its
+          own evidential basis — &ldquo;no escape route found, given{" "}
+          <K>N</K> rules&rdquo; — so that a claim about coverage is
+          syntactically distinct from a confession of ignorance. Those are
+          different objects and they should never share a field.
+        </Note>
+        <P>
+          With both rule sets encoded, the comparison gets sharper than the
+          original version managed. Switch the laboratory to melanoma and look
+          at which combinations survive: <K>{"\\{B,G\\}"}</K> — the
+          combination that is optimal in colorectal, and the one actually
+          approved there — <em>fails</em>. It fails for a principled reason the
+          algebra makes visible: the melanoma escape does not run through the
+          receptor, so blocking the receptor hits nothing. The transferable
+          object is not the drug pair. It is the route family, and route
+          families are lineage-specific even when the driver mutation is not.
         </P>
         <P>
           <Term>Feedback-port reopening.</Term> mTOR inhibition relieves

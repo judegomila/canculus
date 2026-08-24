@@ -70,7 +70,7 @@ export function HorizonSlider() {
       <div className="flex flex-wrap items-center gap-4">
         <Verdict
           ok={robust}
-          okText={`{B} robust over [0, ${T}h] — bypass not yet activatable`}
+          okText={`no escape route within [0, ${T}h] — bypass not yet activatable`}
           failText={`{B} fails over [0, ${T}h] — r₁ activates at t = 12h`}
         />
         <p className="max-w-md font-mono text-[0.74rem] leading-relaxed text-ink-soft">

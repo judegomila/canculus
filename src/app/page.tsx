@@ -969,8 +969,9 @@ export default function Home() {
           The intended implementation is a compiler: pathway sources (SBML,
           BioPAX, rule-based models, perturbation tables) in; typed terms with
           provenance out; then objective-relevant abstraction, route normal
-          form, adaptation closure, robust cuts, and a counterexample-or-
-          certificate report. The paper even sketches a surface syntax:
+          form, adaptation closure, robust cuts, and a report that returns
+          either a counterexample or a certificate. The paper even sketches a
+          surface syntax:
         </P>
         <CodeBlock>{`context CRC_BRAF_V600E
 level L0 signaling
